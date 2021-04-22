@@ -17,40 +17,39 @@ class TaskListState extends State<TaskList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.only(top: 0),
         child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: items.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Dismissible(
-              onDismissed: (DismissDirection direction) {
-                setState(() {
-                  items.removeAt(index);
-                });
-              },
-              secondaryBackground: Container(
-                padding: EdgeInsets.only(right: 20),
-                alignment: Alignment.centerRight,
-                child: Icon(
-                  FlutterIcons.ios_close_circle_ion,
-                  size: 30,
-                ),
-                color: Colors.red,
-              ),
-              background: Container(
-                padding: EdgeInsets.only(left: 20),
-                alignment: Alignment.centerLeft,
-                child: Icon(
-                  FlutterIcons.ios_checkmark_circle_ion,
-                  size: 30,
-                ),
-                color: Colors.green,
-              ),
-              child: items[index],
-              key: UniqueKey(),
-              direction: DismissDirection.horizontal,
-            );
+      shrinkWrap: true,
+      itemCount: items.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Dismissible(
+          onDismissed: (DismissDirection direction) {
+            setState(() {
+              items.removeAt(index);
+            });
           },
-        ));
+          secondaryBackground: Container(
+            padding: EdgeInsets.only(right: 20),
+            alignment: Alignment.centerRight,
+            child: Icon(
+              FlutterIcons.ios_close_circle_ion,
+              size: 30,
+            ),
+            color: Colors.red,
+          ),
+          background: Container(
+            padding: EdgeInsets.only(left: 20),
+            alignment: Alignment.centerLeft,
+            child: Icon(
+              FlutterIcons.ios_checkmark_circle_ion,
+              size: 30,
+            ),
+            color: Colors.green,
+          ),
+          child: items[index],
+          key: UniqueKey(),
+          direction: DismissDirection.horizontal,
+        );
+      },
+    ));
   }
 }

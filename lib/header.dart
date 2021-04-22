@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:task_app/style.dart';
 import 'pages.dart';
 import 'main.dart';
 
@@ -11,7 +12,7 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.only(top: 30, left: 10),
+        margin: EdgeInsets.only(top: 30, left: 5),
         child: Row(children: [
           GestureDetector(
               onTap: () {
@@ -25,7 +26,7 @@ class Header extends StatelessWidget {
               )),
           Text(
             title,
-            style: TextStyle(fontSize: 20),
+            style: HeaderStyle,
           )
         ]));
   }
