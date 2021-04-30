@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 class IconExpand extends StatefulWidget {
+  ValueNotifier text;
+  IconExpand(this.text);
   @override
   _IconExpandState createState() => _IconExpandState();
 }
 
 class _IconExpandState extends State<IconExpand> {
-  String text = "";
   bool show = false;
   @override
   initState() {
@@ -31,7 +32,7 @@ class _IconExpandState extends State<IconExpand> {
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             child: Row(children: [
               Container(
-                  margin: show
+                  margin: show && this.widget.text.value.toString().length > 0
                       ? EdgeInsets.only(right: 10)
                       : EdgeInsets.only(right: 0),
                   child: Icon(
@@ -39,7 +40,16 @@ class _IconExpandState extends State<IconExpand> {
                     color: Colors.black,
                     size: 30.0,
                   )),
-              show ? Text("17/04/2021") : Text("")
+              show
+                  ? ValueListenableBuilder(
+                      valueListenable: this.widget.text,
+                      builder: (context, value, child) {
+                        return Text(value);
+                      },
+                    )
+                  : Container(
+                      width: 0,
+                    )
             ])));
   }
 }

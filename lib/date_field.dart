@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DateField extends StatefulWidget {
+  String date = "";
   @override
   _DateFieldState createState() => _DateFieldState();
 }

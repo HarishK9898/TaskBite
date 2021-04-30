@@ -8,14 +8,8 @@ class Pages extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            body: Container(
-                child: Column(
-      children: [
-        Header("Pages", false),
-        SingleChildScrollView(
-            child: ConstrainedBox(
-                constraints: BoxConstraints(), child: PageList()))
-      ],
-    ))));
+            body: Column(
+      children: [Header("Pages", false), PageList()],
+    )));
   }
 }

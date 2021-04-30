@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:task_app/icon_expand.dart';
 
 class TimeField extends StatefulWidget {
   @override
   _TimeFieldState createState() => _TimeFieldState();
+  String t1 = "";
+  String t2 = "";
+  String time = "";
+  IconExpand exp = IconExpand(ValueNotifier(""));
 }
 
 class _TimeFieldState extends State<TimeField> {
@@ -23,6 +28,9 @@ class _TimeFieldState extends State<TimeField> {
                           keyboardType: TextInputType.number,
                           onChanged: (text) {
                             if (text.length == 1) {
+                              this.widget.t1 = text;
+                              this.widget.time =
+                                  this.widget.t1 + " : " + this.widget.t2;
                               _node.nextFocus();
                             }
                           },
@@ -42,6 +50,10 @@ class _TimeFieldState extends State<TimeField> {
                           keyboardType: TextInputType.number,
                           onChanged: (text) {
                             if (text.length == 2) {
+                              this.widget.t2 = text;
+                              this.widget.time =
+                                  this.widget.t1 + " : " + this.widget.t2;
+                              this.widget.exp.text.value = this.widget.time;
                               _node.nextFocus();
                             }
                           },
@@ -66,6 +78,9 @@ class _TimeFieldState extends State<TimeField> {
                         ),
                         onChanged: (String newValue) {
                           setState(() {
+                            this.widget.time =
+                                this.widget.t1 + " : " + this.widget.t2;
+                            this.widget.exp.text.value = this.widget.time;
                             dropdownValue = newValue;
                           });
                         },

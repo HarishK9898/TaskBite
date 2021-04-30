@@ -9,11 +9,6 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            body: Column(children: [
-      Header("Home", true),
-      SingleChildScrollView(
-          child:
-              ConstrainedBox(constraints: BoxConstraints(), child: TaskList()))
-    ])));
+            body: Column(children: [Header("Home", true), TaskList()])));
   }
 }

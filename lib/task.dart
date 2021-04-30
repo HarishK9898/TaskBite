@@ -8,6 +8,10 @@ import 'time_field.dart';
 
 class Task extends StatefulWidget {
   final String name;
+  ValueNotifier valueNotifier = ValueNotifier(TimeField());
+  TimeField timeField = TimeField();
+  DateField dateField = DateField();
+
   Task(this.name);
   @override
   _TaskState createState() => _TaskState();
@@ -34,7 +38,7 @@ class _TaskState extends State<Task> {
                   ),
                   Row(
                       mainAxisAlignment: MainAxisAlignment.start,
-                      children: [IconExpand()]),
+                      children: [this.widget.timeField.exp]),
                 ]),
           ]),
           children: [
@@ -48,7 +52,7 @@ class _TaskState extends State<Task> {
                 ),
               ),
               new Spacer(),
-              DateField(),
+              this.widget.dateField,
             ])),
             Container(
                 child: Row(children: [
@@ -60,7 +64,7 @@ class _TaskState extends State<Task> {
                 ),
               ),
               new Spacer(),
-              TimeField(),
+              this.widget.timeField,
             ]))
           ],
         )));
