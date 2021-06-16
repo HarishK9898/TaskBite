@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:task_app/date_field.dart';
-import "icon_expand.dart";
+import 'package:task_app/DateTime/date_field.dart';
+import '../DateTime/icon_expand.dart';
 
-import 'style.dart';
-import 'custom_expansion_tile.dart';
-import 'time_field.dart';
+import '../style.dart';
+import '../DateTime/custom_expansion_tile.dart';
+import '../DateTime/time_field.dart';
+import '../Data/Database.dart';
 
 class Task extends StatefulWidget {
-  final String name;
-  ValueNotifier valueNotifier = ValueNotifier(TimeField());
   TimeField timeField = TimeField();
   DateField dateField = DateField();
-
-  Task(this.name);
+  Task_Data task_data;
+  Task(this.task_data);
   @override
   _TaskState createState() => _TaskState();
 }
@@ -32,20 +31,21 @@ class _TaskState extends State<Task> {
                   Container(
                     margin: EdgeInsets.only(bottom: 7),
                     child: Text(
-                      widget.name,
+                      widget.task_data.name,
                       style: TaskTextStyle,
                     ),
                   ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [this.widget.timeField.exp]),
+                  Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                    this.widget.timeField.exp,
+                    this.widget.dateField.exp
+                  ]),
                 ]),
           ]),
           children: [
             Container(
                 child: Row(children: [
               Container(
-                margin: EdgeInsets.only(bottom: 10, top: 10),
+                margin: EdgeInsets.only(bottom: 15, top: 15),
                 child: Text(
                   "Date",
                   style: TextStyle(fontFamily: "Less Sans"),
@@ -57,7 +57,7 @@ class _TaskState extends State<Task> {
             Container(
                 child: Row(children: [
               Container(
-                margin: EdgeInsets.only(bottom: 10, top: 10),
+                margin: EdgeInsets.only(bottom: 15, top: 15),
                 child: Text(
                   "Time",
                   style: TextStyle(fontFamily: "Less Sans"),

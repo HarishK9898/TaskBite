@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'style.dart';
+import 'package:task_app/Tasks/task.dart';
+import '../style.dart';
 
 class TaskPage extends StatefulWidget {
   final name;
   final icon;
-  TaskPage(this.name, this.icon);
+  List<Task> tasks = []; //array of tasks related to this specific page
+  TaskPage(this.name, this.icon, this.tasks);
   @override
   _TaskPageState createState() => _TaskPageState();
 }
