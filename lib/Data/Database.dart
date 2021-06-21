@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
+import 'package:task_app/Pages/TaskPage.dart';
+import 'package:task_app/Tasks/task.dart';
 
 class DBProvider {
   DBProvider._();
@@ -19,28 +21,28 @@ class DBProvider {
         onCreate: (db, version) async {
       await db.execute('''
         CREATE TABLE tasks (
-          id STRING PRIMARY KEY, name TEXT, date TEXT, time TEXT, pageID INTEGER FOREIGN KEY, location TEXT
-        );
+          id STRING PRIMARY KEY, name TEXT, date TEXT, time TEXT, pageID STRING
+        );''');
+      await db.execute('''
         CREATE TABLE pages (
-          id STRING PRIMARY KEY, name TEXT, icon TEXT
-        );
-        ''');
+          id STRING PRIMARY KEY, name TEXT, iconval INTEGER
+        );''');
     }, version: 1);
   }
 
-  Future<List<Task_Data>> getTasks() async {
+  Future<List<Task>> getTasks() async {
     // Get a reference to the database.
     final Database db = await database;
 
     final List<Map<String, dynamic>> maps = await db.query('tasks');
 
     return List.generate(maps.length, (i) {
-      return Task_Data(
+      return Task(Task_Data(
           id: maps[i]['id'],
           name: maps[i]['name'],
-          date: maps[i]['age'],
+          date: maps[i]['date'],
           time: maps[i]['time'],
-          pageID: maps[i]['pageID']);
+          pageID: maps[i]['pageID']));
     });
   }
 
@@ -55,23 +57,28 @@ class DBProvider {
     );
   }
 
-  Future<void> deleteTask(int id) async {
+  Future<void> deleteTask(String id) async {
     final Database db = await database;
-    await db.delete('pages', where: 'id = ?', whereArgs: [id]);
+    await db.delete('tasks', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<List<Page>> getPages() async {
+  Future<List<TaskPage>> getPages() async {
     // Get a reference to the database.
     final Database db = await database;
 
     final List<Map<String, dynamic>> maps = await db.query('pages');
 
     return List.generate(maps.length, (i) {
-      return Page(id: maps[i]['id'], name: maps[i]['name']);
+      return TaskPage(
+          Page_Data(
+              id: maps[i]['id'],
+              name: maps[i]['name'],
+              iconval: maps[i]['iconval']),
+          []);
     });
   }
 
-  Future<void> insertPage(Page page) async {
+  Future<void> insertPage(Page_Data page) async {
     // Get a reference to the database.
     final Database db = await database;
 
@@ -82,7 +89,7 @@ class DBProvider {
     );
   }
 
-  Future<void> deletePage(int id) async {
+  Future<void> deletePage(String id) async {
     final Database db = await database;
     await db.delete('pages', where: 'id = ?', whereArgs: [id]);
   }
@@ -90,10 +97,10 @@ class DBProvider {
 
 class Task_Data {
   final String id;
-  final String name;
-  final String date;
-  final String time;
-  final int pageID;
+  String name;
+  String date;
+  String time;
+  String pageID;
 
   Task_Data({this.id, this.name, this.date, this.time, this.pageID});
 
@@ -103,28 +110,27 @@ class Task_Data {
       'name': name,
       'time': time,
       'date': date,
-      'page': pageID,
+      'pageID': pageID,
     };
   }
 
-  // Implement toString to make it easier to see information about
-  // each dog when using the print statement.
   @override
   String toString() {
     return 'Task{name: $name}';
   }
 }
 
-class Page {
-  final int id;
-  final String name;
-  final String icon;
-  Page({this.id, this.name, this.icon});
+class Page_Data {
+  final String id;
+  String name;
+  int iconval;
+  Page_Data({this.id, this.name, this.iconval});
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
+      'iconval': iconval,
     };
   }
 }

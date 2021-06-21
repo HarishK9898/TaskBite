@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:task_app/DateTime/date_field.dart';
 import '../DateTime/icon_expand.dart';
 
@@ -8,8 +9,6 @@ import '../DateTime/time_field.dart';
 import '../Data/Database.dart';
 
 class Task extends StatefulWidget {
-  TimeField timeField = TimeField();
-  DateField dateField = DateField();
   Task_Data task_data;
   Task(this.task_data);
   @override
@@ -17,8 +16,26 @@ class Task extends StatefulWidget {
 }
 
 class _TaskState extends State<Task> {
+  _updateDate(String text) {
+    setState(() {
+      widget.task_data.date = text;
+      DBProvider.db.insertTask(widget.task_data);
+    });
+  }
+
+  _updateTime(String text) {
+    setState(() {
+      widget.task_data.time = text;
+      DBProvider.db.insertTask(widget.task_data);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    TimeField timeField =
+        TimeField(time: widget.task_data.time, parentAction: _updateTime);
+    DateField dateField =
+        DateField(date: widget.task_data.date, parentAction: _updateDate);
     return Container(
         margin: EdgeInsets.only(left: 15),
         child: Container(
@@ -36,8 +53,23 @@ class _TaskState extends State<Task> {
                     ),
                   ),
                   Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    this.widget.timeField.exp,
-                    this.widget.dateField.exp
+                    widget.task_data.time != null
+                        ? IconExpand(
+                            text: widget.task_data.time,
+                            icon: Icon(
+                              FlutterIcons.clock_mco,
+                              size: 30.0,
+                            ))
+                        : Container(),
+                    widget.task_data.date != null
+                        ? IconExpand(
+                            text: widget.task_data.date,
+                            icon: Icon(
+                              FlutterIcons.date_range_mdi,
+                              color: Colors.black,
+                              size: 30.0,
+                            ))
+                        : Container()
                   ]),
                 ]),
           ]),
@@ -52,7 +84,7 @@ class _TaskState extends State<Task> {
                 ),
               ),
               new Spacer(),
-              this.widget.dateField,
+              dateField,
             ])),
             Container(
                 child: Row(children: [
@@ -64,7 +96,7 @@ class _TaskState extends State<Task> {
                 ),
               ),
               new Spacer(),
-              this.widget.timeField,
+              timeField,
             ]))
           ],
         )));

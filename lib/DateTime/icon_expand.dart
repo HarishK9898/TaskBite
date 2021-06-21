@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 class IconExpand extends StatefulWidget {
-  ValueNotifier text;
+  String text;
   Icon icon;
-  IconExpand(this.text, this.icon);
+  IconExpand({Key key, this.text, this.icon}) : super(key: key);
   @override
   _IconExpandState createState() => _IconExpandState();
 }
@@ -22,6 +22,7 @@ class _IconExpandState extends State<IconExpand> {
     return GestureDetector(
         onTap: () {
           setState(() {
+            print(widget.text);
             show = !show;
           });
         },
@@ -34,17 +35,12 @@ class _IconExpandState extends State<IconExpand> {
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             child: Row(children: [
               Container(
-                  margin: show && this.widget.text.value.toString().length > 0
+                  margin: show && widget.text.length > 0
                       ? EdgeInsets.only(right: 10)
                       : EdgeInsets.only(right: 0),
                   child: this.widget.icon),
               show
-                  ? ValueListenableBuilder(
-                      valueListenable: this.widget.text,
-                      builder: (context, value, child) {
-                        return Text(value);
-                      },
-                    )
+                  ? Text(widget.text)
                   : Container(
                       width: 0,
                     )

@@ -1,21 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:task_app/Data/Database.dart';
 import 'package:task_app/DateTime/icon_expand.dart';
+import 'package:intl/intl.dart';
 
 class TimeField extends StatefulWidget {
+  String time;
+  ValueChanged<String> parentAction;
+  TimeField({Key key, this.time, this.parentAction}) : super(key: key);
   @override
-  _timeFieldState createState() => _timeFieldState();
+  timeFieldState createState() => timeFieldState();
   IconExpand exp = IconExpand(
-      ValueNotifier(""),
-      Icon(
+      text: "",
+      icon: Icon(
         FlutterIcons.clock_mco,
         size: 30.0,
       ));
-  TimeOfDay _time;
-  bool isAM = true;
 }
 
-class _timeFieldState extends State<TimeField> {
+class timeFieldState extends State<TimeField> {
+  String timeOfDayString(TimeOfDay tod) {
+    final now = new DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+    return DateFormat("h : mm a").format(dt);
+  }
+
+  TimeOfDay stringToTimeOfDay(String tod) {
+    final format = DateFormat("h : mm a"); //"6:00 AM"
+    return TimeOfDay.fromDateTime(format.parse(tod));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -24,22 +38,20 @@ class _timeFieldState extends State<TimeField> {
       alignment: Alignment.centerRight,
       child: GestureDetector(
         child: Text(
-          this.widget._time == null
-              ? "Pick a Time"
-              : "${this.widget._time.hour % 12 == 0 ? 12 : this.widget._time.hour % 12} : ${this.widget._time.minute < 10 ? "0" + this.widget._time.minute.toString() : this.widget._time.minute} ${this.widget.isAM ? "AM" : "PM"} ",
+          widget.time == null ? "Pick a Time" : "${widget.time} ",
           style: TextStyle(fontFamily: "Less Sans"),
         ),
         onTap: () {
           showTimePicker(
             context: context,
-            initialTime:
-                this.widget._time == null ? TimeOfDay.now() : this.widget._time,
+            initialTime: widget.time == null
+                ? TimeOfDay.now()
+                : stringToTimeOfDay(widget.time),
           ).then((time) {
             setState(() {
-              this.widget._time = time;
-              this.widget.isAM = this.widget._time.hour / 12 <= 1;
-              this.widget.exp.text.value =
-                  "${this.widget._time.hour % 12 == 0 ? 12 : this.widget._time.hour % 12} : ${this.widget._time.minute < 10 ? "0" + this.widget._time.minute.toString() : this.widget._time.minute} ${this.widget.isAM ? "AM" : "PM"} ";
+              widget.time = timeOfDayString(time);
+              widget.parentAction(widget.time);
+              widget.exp.text = "${widget.time} ";
             });
           });
         },

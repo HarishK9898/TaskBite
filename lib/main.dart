@@ -14,10 +14,33 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var tasks = [];
-  var pages = [];
+  Future<dynamic> task_data_list;
+  Future<dynamic> page_data_list;
+  @override
+  void initState() {
+    task_data_list = getTasks();
+    page_data_list = getPages();
+    super.initState();
+  }
 
-  var curr_page;
+  getPages() async {
+    final data = await DBProvider.db.getPages();
+    return data;
+  }
+
+  getTasks() async {
+    final data = await DBProvider.db.getTasks();
+    return data;
+  }
+
+  bool retrieved = false;
+
+  List<Task> tasks = [];
+  List<TaskPage> pages = [];
+
+  List<Task> retrieved_tasks = [];
+
+  TaskPage curr_page;
   var curr_Name = "";
 
   var default_new_task = true;
@@ -88,7 +111,10 @@ class _HomeState extends State<Home> {
               return Dismissible(
                 onDismissed: (DismissDirection direction) {
                   setState(() {
+                    DBProvider.db.deleteTask(tasks[index].task_data.id);
+                    retrieved_tasks.remove(tasks[index]);
                     tasks.removeAt(index);
+                    //remove from tasks here
                   });
                 },
                 secondaryBackground: Container(
@@ -146,9 +172,16 @@ class _HomeState extends State<Home> {
                                     keyboardType: TextInputType.text,
                                     onSubmitted: (text) {
                                       setState(() {
-                                        tasks.add(Task(Task_Data(
-                                            id: uuid.v1(), name: text)));
+                                        var task_data = Task_Data(
+                                            id: uuid.v1(),
+                                            name: text,
+                                            pageID: curr_page == null
+                                                ? "generic"
+                                                : curr_page.page.id);
+                                        tasks.add(Task(task_data));
+                                        //insert into tasks here
                                         default_new_task = !default_new_task;
+                                        DBProvider.db.insertTask(task_data);
                                       });
                                     },
                                     decoration: InputDecoration(
@@ -163,124 +196,307 @@ class _HomeState extends State<Home> {
                           ]))))
         ]))
       ]),
-      Column(children: [
-        Container(
-            margin: EdgeInsets.only(top: 30, left: 5),
-            child: Row(children: [
-              GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      index_val = 0;
-                    });
+      retrieved
+          ? Column(children: [
+              Container(
+                  margin: EdgeInsets.only(top: 30, left: 5),
+                  child: Row(children: [
+                    GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            index_val = 0;
+                          });
+                        },
+                        child: Icon(
+                          FlutterIcons.ios_arrow_back_ion,
+                          size: 45,
+                        )),
+                    Text(
+                      "Pages",
+                      style: HeaderStyle,
+                    )
+                  ])),
+              Expanded(
+                  child: ListView(children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: ClampingScrollPhysics(),
+                  itemCount: pages.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            index_val = 0;
+                            curr_page = pages[index];
+                            curr_Name = curr_page.page.name;
+                            tasks = curr_page.tasks;
+                          });
+                        },
+                        child: Dismissible(
+                          onDismissed: (DismissDirection direction) {
+                            setState(() {
+                              DBProvider.db.deletePage(pages[index].page.id);
+                              pages[index].tasks.forEach((element) {
+                                DBProvider.db.deleteTask(element.task_data.id);
+                              });
+                              pages.removeAt(index);
+                              //remove from pages and tasks here
+                            });
+                          },
+                          secondaryBackground: Container(
+                            padding: EdgeInsets.only(right: 20),
+                            alignment: Alignment.centerRight,
+                            child: Icon(
+                              FlutterIcons.ios_close_circle_ion,
+                              size: 30,
+                            ),
+                            color: Colors.red,
+                          ),
+                          background: Container(),
+                          child: pages[index],
+                          key: UniqueKey(),
+                          direction: DismissDirection.endToStart,
+                        ));
                   },
-                  child: Icon(
-                    FlutterIcons.ios_arrow_back_ion,
-                    size: 45,
-                  )),
-              Text(
-                "Pages",
-                style: HeaderStyle,
-              )
-            ])),
-        Expanded(
-            child: ListView(children: [
-          ListView.builder(
-            shrinkWrap: true,
-            physics: ClampingScrollPhysics(),
-            itemCount: pages.length,
-            itemBuilder: (BuildContext context, int index) {
-              return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      index_val = 0;
-                      curr_page = pages[index];
-                      curr_Name = curr_page.name;
-                      tasks = curr_page.tasks;
-                    });
-                  },
-                  child: Dismissible(
-                    onDismissed: (DismissDirection direction) {
+                ),
+                GestureDetector(
+                    onTap: () {
                       setState(() {
-                        pages.removeAt(index);
+                        default_new_page = !default_new_page;
                       });
                     },
-                    secondaryBackground: Container(
-                      padding: EdgeInsets.only(right: 20),
-                      alignment: Alignment.centerRight,
-                      child: Icon(
-                        FlutterIcons.ios_close_circle_ion,
-                        size: 30,
-                      ),
-                      color: Colors.red,
-                    ),
-                    background: Container(),
-                    child: pages[index],
-                    key: UniqueKey(),
-                    direction: DismissDirection.endToStart,
-                  ));
-            },
-          ),
-          GestureDetector(
-              onTap: () {
-                setState(() {
-                  default_new_page = !default_new_page;
-                });
-              },
-              child: Container(
-                  child: default_new_page
-                      ? Container(
-                          margin: EdgeInsets.only(top: 10, bottom: 30),
-                          child: Stack(children: [
-                            Container(
-                                margin: EdgeInsets.only(left: 40),
-                                child: Icon(
-                                  FlutterIcons.ios_add_ion,
-                                  size: 30,
-                                )),
-                            Container(
-                                margin: EdgeInsets.only(top: 8),
-                                alignment: Alignment.center,
-                                child: Text("New Page", style: TaskTextStyle))
-                          ]))
-                      : Container(
-                          margin: EdgeInsets.only(top: 10, bottom: 30),
-                          padding: EdgeInsets.only(left: 20, right: 20),
+                    child: Container(
+                        child: default_new_page
+                            ? Container(
+                                margin: EdgeInsets.only(top: 10, bottom: 30),
+                                child: Stack(children: [
+                                  Container(
+                                      margin: EdgeInsets.only(left: 40),
+                                      child: Icon(
+                                        FlutterIcons.ios_add_ion,
+                                        size: 30,
+                                      )),
+                                  Container(
+                                      margin: EdgeInsets.only(top: 8),
+                                      alignment: Alignment.center,
+                                      child: Text("New Page",
+                                          style: TaskTextStyle))
+                                ]))
+                            : Container(
+                                margin: EdgeInsets.only(top: 10, bottom: 30),
+                                padding: EdgeInsets.only(left: 20, right: 20),
+                                child: Row(children: [
+                                  Container(
+                                      margin:
+                                          EdgeInsets.only(right: 5, bottom: 10),
+                                      child: DropdownButton(
+                                          value: val,
+                                          items: droplist,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              val = value;
+                                            });
+                                          })),
+                                  Expanded(
+                                      child: TextField(
+                                          keyboardType: TextInputType.text,
+                                          onSubmitted: (text) {
+                                            setState(() {
+                                              var page_data = Page_Data(
+                                                  iconval: val,
+                                                  name: text,
+                                                  id: uuid.v1());
+                                              pages
+                                                  .add(TaskPage(page_data, []));
+                                              //insert into pages here
+                                              DBProvider.db
+                                                  .insertPage(page_data);
+                                              default_new_page =
+                                                  !default_new_page;
+                                            });
+                                          },
+                                          decoration: InputDecoration(
+                                              counterText: "",
+                                              hintStyle:
+                                                  TextStyle(color: Colors.grey),
+                                              hintText: "New Page",
+                                              isDense: true,
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      vertical: 0)))),
+                                  Container(
+                                      margin: EdgeInsets.only(left: 5),
+                                      child: Icon(FlutterIcons
+                                          .ios_close_circle_outline_ion))
+                                ]))))
+              ]))
+            ])
+          : FutureBuilder(
+              future: Future.wait([task_data_list, page_data_list]),
+              builder: (_, pageData) {
+                switch (pageData.connectionState) {
+                  case ConnectionState.none:
+                    return Container();
+                  case ConnectionState.waiting:
+                    return Container();
+                  case ConnectionState.active:
+                  case ConnectionState.done:
+                    pages = pageData.data[1];
+                    retrieved_tasks = pageData.data[0];
+                    if (!retrieved) {
+                      pages.forEach((page) {
+                        retrieved_tasks.forEach((task) {
+                          if (task.task_data.pageID == page.page.id &&
+                              page.tasks.contains(task) == false) {
+                            page.tasks.add(task);
+                          }
+                        });
+                      });
+                      retrieved = true;
+                    }
+                    return Column(children: [
+                      Container(
+                          margin: EdgeInsets.only(top: 30, left: 5),
                           child: Row(children: [
-                            Container(
-                                margin: EdgeInsets.only(right: 5, bottom: 10),
-                                child: DropdownButton(
-                                    value: val,
-                                    items: droplist,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        val = value;
-                                      });
-                                    })),
-                            Expanded(
-                                child: TextField(
-                                    keyboardType: TextInputType.text,
-                                    onSubmitted: (text) {
-                                      setState(() {
-                                        pages.add(
-                                            TaskPage(text, iconList[val], []));
-                                        default_new_page = !default_new_page;
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                        counterText: "",
-                                        hintStyle:
-                                            TextStyle(color: Colors.grey),
-                                        hintText: "New Page",
-                                        isDense: true,
-                                        contentPadding: EdgeInsets.symmetric(
-                                            vertical: 0)))),
-                            Container(
-                                margin: EdgeInsets.only(left: 5),
+                            GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    index_val = 0;
+                                  });
+                                },
                                 child: Icon(
-                                    FlutterIcons.ios_close_circle_outline_ion))
-                          ]))))
-        ]))
-      ])
+                                  FlutterIcons.ios_arrow_back_ion,
+                                  size: 45,
+                                )),
+                            Text(
+                              "Pages",
+                              style: HeaderStyle,
+                            )
+                          ])),
+                      Expanded(
+                          child: ListView(children: [
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemCount: pages.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    index_val = 0;
+                                    curr_page = pages[index];
+                                    curr_Name = curr_page.page.name;
+                                    tasks = curr_page.tasks;
+                                  });
+                                },
+                                child: Dismissible(
+                                  onDismissed: (DismissDirection direction) {
+                                    setState(() {
+                                      DBProvider.db
+                                          .deletePage(pages[index].page.id);
+                                      pages[index].tasks.forEach((element) {
+                                        DBProvider.db
+                                            .deleteTask(element.task_data.id);
+                                      });
+                                      pages.removeAt(index);
+                                      //remove from pages and tasks here
+                                    });
+                                  },
+                                  secondaryBackground: Container(
+                                    padding: EdgeInsets.only(right: 20),
+                                    alignment: Alignment.centerRight,
+                                    child: Icon(
+                                      FlutterIcons.ios_close_circle_ion,
+                                      size: 30,
+                                    ),
+                                    color: Colors.red,
+                                  ),
+                                  background: Container(),
+                                  child: pages[index],
+                                  key: UniqueKey(),
+                                  direction: DismissDirection.endToStart,
+                                ));
+                          },
+                        ),
+                        GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                default_new_page = !default_new_page;
+                              });
+                            },
+                            child: Container(
+                                child: default_new_page
+                                    ? Container(
+                                        margin: EdgeInsets.only(
+                                            top: 10, bottom: 30),
+                                        child: Stack(children: [
+                                          Container(
+                                              margin: EdgeInsets.only(left: 40),
+                                              child: Icon(
+                                                FlutterIcons.ios_add_ion,
+                                                size: 30,
+                                              )),
+                                          Container(
+                                              margin: EdgeInsets.only(top: 8),
+                                              alignment: Alignment.center,
+                                              child: Text("New Page",
+                                                  style: TaskTextStyle))
+                                        ]))
+                                    : Container(
+                                        margin: EdgeInsets.only(
+                                            top: 10, bottom: 30),
+                                        padding: EdgeInsets.only(
+                                            left: 20, right: 20),
+                                        child: Row(children: [
+                                          Container(
+                                              margin: EdgeInsets.only(
+                                                  right: 5, bottom: 10),
+                                              child: DropdownButton(
+                                                  value: val,
+                                                  items: droplist,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      val = value;
+                                                    });
+                                                  })),
+                                          Expanded(
+                                              child: TextField(
+                                                  keyboardType:
+                                                      TextInputType.text,
+                                                  onSubmitted: (text) {
+                                                    setState(() {
+                                                      var page_data = Page_Data(
+                                                          iconval: val,
+                                                          name: text,
+                                                          id: uuid.v1());
+                                                      pages.add(TaskPage(
+                                                          page_data, []));
+                                                      //insert into pages here
+                                                      DBProvider.db.insertPage(
+                                                          page_data);
+                                                      default_new_page =
+                                                          !default_new_page;
+                                                    });
+                                                  },
+                                                  decoration: InputDecoration(
+                                                      counterText: "",
+                                                      hintStyle: TextStyle(
+                                                          color: Colors.grey),
+                                                      hintText: "New Page",
+                                                      isDense: true,
+                                                      contentPadding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 0)))),
+                                          Container(
+                                              margin: EdgeInsets.only(left: 5),
+                                              child: Icon(FlutterIcons
+                                                  .ios_close_circle_outline_ion))
+                                        ]))))
+                      ]))
+                    ]);
+                }
+                return Container();
+              })
     ])));
   }
 }
