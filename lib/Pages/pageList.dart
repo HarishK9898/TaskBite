@@ -10,8 +10,8 @@ import '../style.dart';
 class PageList extends StatefulWidget {
   List<Task> taskList;
   List<TaskPage> pageList;
-  Function changeIndex;
-  Function updatePage;
+  VoidCallback changeIndex;
+  ValueSetter<TaskPage> updatePage;
   PageList(
       {Key key,
       this.taskList,

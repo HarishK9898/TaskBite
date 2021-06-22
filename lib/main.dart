@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:task_app/Tasks/taskList.dart';
 import 'package:task_app/style.dart';
 import 'package:task_app/Tasks/task.dart';
 import 'Pages/page.dart';
@@ -24,10 +25,12 @@ class _HomeState extends State<Home> {
   }
 
   _updateIndex() {
-    if (index_val == 0)
-      index_val = 1;
-    else
-      index_val = 0;
+    setState(() {
+      if (index_val == 0)
+        index_val = 1;
+      else
+        index_val = 0;
+    });
   }
 
   _updatePage(TaskPage page) {
@@ -107,123 +110,11 @@ class _HomeState extends State<Home> {
     return MaterialApp(
         home: Scaffold(
             body: AnimatedIndexedStack(index: index_val, children: [
-      Column(children: [
-        Container(
-            margin: EdgeInsets.only(top: 30, left: 5),
-            child: Row(children: [
-              GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _updateIndex();
-                      if (curr_page != null) {
-                        curr_page.tasks = tasks;
-                      }
-                    });
-                  },
-                  child: Icon(
-                    FlutterIcons.menu_mdi,
-                    size: 45,
-                  )),
-              Text(
-                curr_Name,
-                style: HeaderStyle,
-              )
-            ])),
-        Expanded(
-            child: ListView(children: [
-          ListView.builder(
-            shrinkWrap: true,
-            physics: ClampingScrollPhysics(),
-            itemCount: tasks.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Dismissible(
-                onDismissed: (DismissDirection direction) {
-                  setState(() {
-                    DBProvider.db.deleteTask(tasks[index].task_data.id);
-                    retrieved_tasks.remove(tasks[index]);
-                    tasks.removeAt(index);
-                    //remove from tasks here
-                  });
-                },
-                secondaryBackground: Container(
-                  padding: EdgeInsets.only(right: 20),
-                  alignment: Alignment.centerRight,
-                  child: Icon(
-                    FlutterIcons.ios_close_circle_ion,
-                    size: 30,
-                  ),
-                  color: Colors.red,
-                ),
-                background: Container(
-                  padding: EdgeInsets.only(left: 20),
-                  alignment: Alignment.centerLeft,
-                  child: Icon(
-                    FlutterIcons.ios_checkmark_circle_ion,
-                    size: 30,
-                  ),
-                  color: Colors.green,
-                ),
-                child: tasks[index],
-                key: UniqueKey(),
-                direction: DismissDirection.horizontal,
-              );
-            },
-          ),
-          GestureDetector(
-              onTap: () {
-                setState(() {
-                  default_new_task = !default_new_task;
-                });
-              },
-              child: Container(
-                  child: default_new_task
-                      ? Container(
-                          margin: EdgeInsets.only(top: 30, bottom: 30),
-                          child: Stack(children: [
-                            Container(
-                                margin: EdgeInsets.only(left: 40),
-                                child: Icon(
-                                  FlutterIcons.ios_add_ion,
-                                  size: 30,
-                                )),
-                            Container(
-                                margin: EdgeInsets.only(top: 8),
-                                alignment: Alignment.center,
-                                child: Text("New Task", style: TaskTextStyle))
-                          ]))
-                      : Container(
-                          margin: EdgeInsets.only(top: 30, bottom: 30),
-                          padding: EdgeInsets.only(left: 30, right: 30),
-                          child: Row(children: [
-                            Expanded(
-                                child: TextField(
-                                    keyboardType: TextInputType.text,
-                                    onSubmitted: (text) {
-                                      setState(() {
-                                        var task_data = Task_Data(
-                                            id: uuid.v1(),
-                                            name: text,
-                                            pageID: curr_page == null
-                                                ? "generic"
-                                                : curr_page.page.id);
-                                        tasks.add(Task(task_data));
-                                        //insert into tasks here
-                                        default_new_task = !default_new_task;
-                                        DBProvider.db.insertTask(task_data);
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                        counterText: "",
-                                        hintStyle:
-                                            TextStyle(color: Colors.grey),
-                                        hintText: "New Task",
-                                        isDense: true,
-                                        contentPadding: EdgeInsets.symmetric(
-                                            vertical: 0)))),
-                            Icon(FlutterIcons.ios_close_circle_outline_ion)
-                          ]))))
-        ]))
-      ]),
+      TaskList(
+        taskList: tasks,
+        changeIndex: _updateIndex,
+        currPage: curr_page,
+      ),
       retrieved
           ? Column(children: [
               Container(

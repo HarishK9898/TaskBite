@@ -10,7 +10,7 @@ import '../style.dart';
 class TaskList extends StatefulWidget {
   List<Task> taskList;
   TaskPage currPage;
-  Function changeIndex;
+  VoidCallback changeIndex;
   TaskList({Key key, this.taskList, this.changeIndex, this.currPage})
       : super(key: key);
 
@@ -41,7 +41,7 @@ class _TaskListState extends State<TaskList> {
                   size: 45,
                 )),
             Text(
-              widget.currPage.page.name,
+              widget.currPage != null ? widget.currPage.page.name : "",
               style: HeaderStyle,
             )
           ])),
