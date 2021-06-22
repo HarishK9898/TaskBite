@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:task_app/style.dart';
 import 'package:task_app/Tasks/task.dart';
-import 'Pages/TaskPage.dart';
+import 'Pages/page.dart';
 import 'Data/Database.dart';
 import 'package:uuid/uuid.dart';
 
@@ -21,6 +21,19 @@ class _HomeState extends State<Home> {
     task_data_list = getTasks();
     page_data_list = getPages();
     super.initState();
+  }
+
+  _updateIndex() {
+    if (index_val == 0)
+      index_val = 1;
+    else
+      index_val = 0;
+  }
+
+  _updatePage(TaskPage page) {
+    curr_page = page;
+    curr_Name = curr_page.page.name;
+    tasks = curr_page.tasks;
   }
 
   getPages() async {
@@ -45,6 +58,21 @@ class _HomeState extends State<Home> {
 
   var default_new_task = true;
   var default_new_page = true;
+
+  var curr_widget = Container(
+      margin: EdgeInsets.only(top: 30, bottom: 30),
+      child: Stack(children: [
+        Container(
+            margin: EdgeInsets.only(left: 40),
+            child: Icon(
+              FlutterIcons.ios_add_ion,
+              size: 30,
+            )),
+        Container(
+            margin: EdgeInsets.only(top: 8),
+            alignment: Alignment.center,
+            child: Text("New Task", style: TaskTextStyle))
+      ]));
 
   static const droplist = [
     DropdownMenuItem(
@@ -86,7 +114,7 @@ class _HomeState extends State<Home> {
               GestureDetector(
                   onTap: () {
                     setState(() {
-                      index_val = 1;
+                      _updateIndex();
                       if (curr_page != null) {
                         curr_page.tasks = tasks;
                       }
@@ -204,7 +232,7 @@ class _HomeState extends State<Home> {
                     GestureDetector(
                         onTap: () {
                           setState(() {
-                            index_val = 0;
+                            _updateIndex();
                           });
                         },
                         child: Icon(
@@ -226,10 +254,8 @@ class _HomeState extends State<Home> {
                     return GestureDetector(
                         onTap: () {
                           setState(() {
-                            index_val = 0;
-                            curr_page = pages[index];
-                            curr_Name = curr_page.page.name;
-                            tasks = curr_page.tasks;
+                            _updateIndex();
+                            _updatePage(pages[index]);
                           });
                         },
                         child: Dismissible(
@@ -361,7 +387,7 @@ class _HomeState extends State<Home> {
                             GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    index_val = 0;
+                                    _updateIndex();
                                   });
                                 },
                                 child: Icon(
@@ -383,7 +409,7 @@ class _HomeState extends State<Home> {
                             return GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    index_val = 0;
+                                    _updateIndex();
                                     curr_page = pages[index];
                                     curr_Name = curr_page.page.name;
                                     tasks = curr_page.tasks;

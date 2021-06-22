@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
-import 'package:task_app/Pages/TaskPage.dart';
+import 'package:task_app/Pages/page.dart';
 import 'package:task_app/Tasks/task.dart';
 
 class DBProvider {

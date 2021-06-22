@@ -9,7 +9,7 @@ class IconExpand extends StatefulWidget {
   _IconExpandState createState() => _IconExpandState();
 }
 
-class _IconExpandState extends State<IconExpand> {
+class _IconExpandState extends State<IconExpand> with TickerProviderStateMixin {
   bool show = false;
   @override
   initState() {
@@ -39,11 +39,15 @@ class _IconExpandState extends State<IconExpand> {
                       ? EdgeInsets.only(right: 10)
                       : EdgeInsets.only(right: 0),
                   child: this.widget.icon),
-              show
-                  ? Text(widget.text)
-                  : Container(
-                      width: 0,
-                    )
+              AnimatedSize(
+                  vsync: this,
+                  duration: Duration(milliseconds: 150),
+                  curve: Curves.fastOutSlowIn,
+                  child: show
+                      ? Text(widget.text)
+                      : Container(
+                          width: 0,
+                        ))
             ])));
   }
 }
