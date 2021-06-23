@@ -37,7 +37,7 @@ class _TaskListState extends State<TaskList> {
                   });
                 },
                 child: Icon(
-                  FlutterIcons.menu_mdi,
+                  FlutterIcons.keyboard_arrow_left_mdi,
                   size: 45,
                 )),
             Text(

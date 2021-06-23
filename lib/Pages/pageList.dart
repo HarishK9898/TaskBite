@@ -47,18 +47,8 @@ class _PageListState extends State<PageList> {
   Widget build(BuildContext context) {
     return Column(children: [
       Container(
-          margin: EdgeInsets.only(top: 30, left: 5),
+          margin: EdgeInsets.only(top: 30, left: 15),
           child: Row(children: [
-            GestureDetector(
-                onTap: () {
-                  setState(() {
-                    widget.changeIndex();
-                  });
-                },
-                child: Icon(
-                  FlutterIcons.ios_arrow_back_ion,
-                  size: 45,
-                )),
             Text(
               "Pages",
               style: HeaderStyle,
