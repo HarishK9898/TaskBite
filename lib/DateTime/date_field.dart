@@ -33,6 +33,21 @@ class _DateFieldState extends State<DateField> {
         ),
         onTap: () {
           showDatePicker(
+                  builder: (context, child) {
+                    return Theme(
+                      data: ThemeData.light().copyWith(
+                        highlightColor: Colors.black,
+                        colorScheme: ColorScheme.light(
+                            primary: Colors.black12,
+                            surface: Colors.white,
+                            onPrimary: Colors.white,
+                            onSurface: Colors.black),
+                        buttonTheme:
+                            ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                      ),
+                      child: child,
+                    );
+                  },
                   context: context,
                   initialDate: widget.date == null
                       ? DateTime.now()

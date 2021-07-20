@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:task_app/Data/Database.dart';
@@ -25,7 +26,7 @@ class _TaskListState extends State<TaskList> {
   Widget build(BuildContext context) {
     return Column(children: [
       Container(
-          margin: EdgeInsets.only(top: 30, left: 5),
+          margin: EdgeInsets.only(top: 40, left: 10),
           child: Row(children: [
             GestureDetector(
                 onTap: () {
@@ -38,7 +39,7 @@ class _TaskListState extends State<TaskList> {
                 },
                 child: Icon(
                   FlutterIcons.keyboard_arrow_left_mdi,
-                  size: 45,
+                  size: 40,
                 )),
             Text(
               widget.currPage != null ? widget.currPage.page.name : "",
@@ -56,6 +57,8 @@ class _TaskListState extends State<TaskList> {
               onDismissed: (DismissDirection direction) {
                 setState(() {
                   DBProvider.db.deleteTask(widget.taskList[index].task_data.id);
+                  AwesomeNotifications()
+                      .cancel(widget.taskList[index].task_data.id.hashCode);
                   widget.taskList.removeAt(index);
                   //remove from widget.taskList here
                 });
@@ -69,18 +72,10 @@ class _TaskListState extends State<TaskList> {
                 ),
                 color: Colors.red,
               ),
-              background: Container(
-                padding: EdgeInsets.only(left: 20),
-                alignment: Alignment.centerLeft,
-                child: Icon(
-                  FlutterIcons.ios_checkmark_circle_ion,
-                  size: 30,
-                ),
-                color: Colors.green,
-              ),
+              background: Container(),
               child: widget.taskList[index],
               key: UniqueKey(),
-              direction: DismissDirection.horizontal,
+              direction: DismissDirection.endToStart,
             );
           },
         ),
@@ -93,7 +88,7 @@ class _TaskListState extends State<TaskList> {
             child: Container(
                 child: default_new_task
                     ? Container(
-                        margin: EdgeInsets.only(top: 30, bottom: 30),
+                        margin: EdgeInsets.only(top: 10, bottom: 30),
                         child: Stack(children: [
                           Container(
                               margin: EdgeInsets.only(left: 40),
@@ -107,7 +102,7 @@ class _TaskListState extends State<TaskList> {
                               child: Text("New Task", style: TaskTextStyle))
                         ]))
                     : Container(
-                        margin: EdgeInsets.only(top: 30, bottom: 30),
+                        margin: EdgeInsets.only(top: 10, bottom: 30),
                         padding: EdgeInsets.only(left: 30, right: 30),
                         child: Row(children: [
                           Expanded(
@@ -115,18 +110,22 @@ class _TaskListState extends State<TaskList> {
                                   keyboardType: TextInputType.text,
                                   onSubmitted: (text) {
                                     setState(() {
-                                      var task_data = Task_Data(
-                                          id: uuid.v1(),
-                                          name: text,
-                                          pageID: widget.currPage == null
-                                              ? "generic"
-                                              : widget.currPage.page.id);
-                                      widget.taskList.add(Task(task_data));
-                                      //insert into widget.taskList here
-                                      default_new_task = !default_new_task;
-                                      DBProvider.db.insertTask(task_data);
+                                      if (text.length > 0) {
+                                        var task_data = Task_Data(
+                                            id: uuid.v1(),
+                                            name: text,
+                                            pageID: widget.currPage == null
+                                                ? "generic"
+                                                : widget.currPage.page.id,
+                                            isComplete: 0);
+                                        widget.taskList.add(Task(task_data));
+                                        //insert into widget.taskList here
+                                        default_new_task = !default_new_task;
+                                        DBProvider.db.insertTask(task_data);
+                                      }
                                     });
                                   },
+                                  autofocus: true,
                                   decoration: InputDecoration(
                                       counterText: "",
                                       hintStyle: TextStyle(color: Colors.grey),

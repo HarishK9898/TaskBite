@@ -43,6 +43,18 @@ class timeFieldState extends State<TimeField> {
         ),
         onTap: () {
           showTimePicker(
+            builder: (context, child) {
+              return Theme(
+                data: ThemeData.light().copyWith(
+                    colorScheme: ColorScheme.light(
+                        primary: Colors.black87,
+                        brightness: Brightness.dark,
+                        surface: Colors.white,
+                        onPrimary: Colors.white,
+                        onSurface: Colors.black)),
+                child: child,
+              );
+            },
             context: context,
             initialTime: widget.time == null
                 ? TimeOfDay.now()

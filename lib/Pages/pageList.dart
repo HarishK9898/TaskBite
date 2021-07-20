@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:task_app/Data/Database.dart';
@@ -12,6 +13,7 @@ class PageList extends StatefulWidget {
   List<TaskPage> pageList;
   VoidCallback changeIndex;
   ValueSetter<TaskPage> updatePage;
+  TaskPage alltasks;
   PageList(
       {Key key,
       this.taskList,
@@ -28,18 +30,32 @@ class _PageListState extends State<PageList> {
   var default_new_page = true;
   static const droplist = [
     DropdownMenuItem(
-      child: Icon(FlutterIcons.ios_home_ion),
+      child: Icon(
+        FlutterIcons.ios_home_ion,
+      ),
       value: 0,
     ),
     DropdownMenuItem(
-      child: Icon(FlutterIcons.ios_book_ion),
+      child: Icon(
+        FlutterIcons.ios_book_ion,
+      ),
       value: 1,
     ),
     DropdownMenuItem(
-      child: Icon(FlutterIcons.ios_musical_note_ion),
+      child: Icon(
+        FlutterIcons.shopping_cart_mdi,
+      ),
       value: 2,
     ),
-    DropdownMenuItem(child: Icon(FlutterIcons.ios_alarm_ion), value: 3)
+    DropdownMenuItem(
+        child: Icon(
+          FlutterIcons.work_mdi,
+        ),
+        value: 3),
+    DropdownMenuItem(child: Icon(FlutterIcons.running_faw5s), value: 4),
+    DropdownMenuItem(
+        child: Icon(FlutterIcons.controller_classic_mco), value: 5),
+    DropdownMenuItem(child: Icon(FlutterIcons.food_fork_drink_mco), value: 6)
   ];
   int val = 0;
   var uuid = Uuid();
@@ -47,7 +63,7 @@ class _PageListState extends State<PageList> {
   Widget build(BuildContext context) {
     return Column(children: [
       Container(
-          margin: EdgeInsets.only(top: 30, left: 15),
+          margin: EdgeInsets.only(top: 40, left: 20, bottom: 10),
           child: Row(children: [
             Text(
               "Pages",
@@ -73,6 +89,8 @@ class _PageListState extends State<PageList> {
                     setState(() {
                       DBProvider.db.deletePage(widget.pageList[index].page.id);
                       widget.pageList[index].tasks.forEach((element) {
+                        AwesomeNotifications()
+                            .cancel(element.task_data.id.hashCode);
                         DBProvider.db.deleteTask(element.task_data.id);
                       });
                       widget.pageList.removeAt(index);
@@ -134,17 +152,20 @@ class _PageListState extends State<PageList> {
                           Expanded(
                               child: TextField(
                                   keyboardType: TextInputType.text,
+                                  autofocus: true,
                                   onSubmitted: (text) {
                                     setState(() {
-                                      var page_data = Page_Data(
-                                          iconval: val,
-                                          name: text,
-                                          id: uuid.v1());
-                                      widget.pageList
-                                          .add(TaskPage(page_data, []));
-                                      //insert into widget.pageList here
-                                      DBProvider.db.insertPage(page_data);
-                                      default_new_page = !default_new_page;
+                                      if (text.length > 0) {
+                                        var page_data = Page_Data(
+                                            iconval: val,
+                                            name: text,
+                                            id: uuid.v1());
+                                        widget.pageList.add(
+                                            TaskPage(page_data, [], false));
+                                        //insert into widget.pageList here
+                                        DBProvider.db.insertPage(page_data);
+                                        default_new_page = !default_new_page;
+                                      }
                                     });
                                   },
                                   decoration: InputDecoration(

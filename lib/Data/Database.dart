@@ -21,7 +21,7 @@ class DBProvider {
         onCreate: (db, version) async {
       await db.execute('''
         CREATE TABLE tasks (
-          id STRING PRIMARY KEY, name TEXT, date TEXT, time TEXT, pageID STRING
+          id STRING PRIMARY KEY, name TEXT, date TEXT, time TEXT, pageID STRING, isComplete INTEGER
         );''');
       await db.execute('''
         CREATE TABLE pages (
@@ -42,7 +42,8 @@ class DBProvider {
           name: maps[i]['name'],
           date: maps[i]['date'],
           time: maps[i]['time'],
-          pageID: maps[i]['pageID']));
+          pageID: maps[i]['pageID'],
+          isComplete: maps[i]['isComplete']));
     });
   }
 
@@ -74,7 +75,8 @@ class DBProvider {
               id: maps[i]['id'],
               name: maps[i]['name'],
               iconval: maps[i]['iconval']),
-          []);
+          [],
+          false);
     });
   }
 
@@ -101,8 +103,10 @@ class Task_Data {
   String date;
   String time;
   String pageID;
+  int isComplete;
 
-  Task_Data({this.id, this.name, this.date, this.time, this.pageID});
+  Task_Data(
+      {this.id, this.name, this.date, this.time, this.pageID, this.isComplete});
 
   Map<String, dynamic> toMap() {
     return {
@@ -111,6 +115,7 @@ class Task_Data {
       'time': time,
       'date': date,
       'pageID': pageID,
+      'isComplete': isComplete,
     };
   }
 

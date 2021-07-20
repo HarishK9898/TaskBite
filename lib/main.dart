@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:task_app/Pages/pageList.dart';
 import 'package:task_app/Tasks/taskList.dart';
 import 'package:task_app/style.dart';
@@ -7,8 +8,26 @@ import 'package:task_app/Tasks/task.dart';
 import 'Pages/page.dart';
 import 'Data/Database.dart';
 import 'package:uuid/uuid.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
-void main() => runApp(Home());
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  AwesomeNotifications().initialize(null, // icon for your app notification
+      [
+        NotificationChannel(
+            channelKey: 'key1',
+            channelName: 'Proto Coders Point',
+            channelDescription: "Notification example",
+            defaultColor: Color(0XFF9050DD),
+            ledColor: Colors.white,
+            playSound: false,
+            enableLights: true,
+            enableVibration: true)
+      ]);
+  runApp(Home());
+}
 
 class Home extends StatefulWidget {
   @override
@@ -50,12 +69,10 @@ class _HomeState extends State<Home> {
   }
 
   bool retrieved = false;
-
   List<Task> tasks = [];
   List<TaskPage> pages = [];
 
   TaskPage curr_page;
-
   int index_val = 0;
   @override
   Widget build(BuildContext context) {
@@ -79,8 +96,9 @@ class _HomeState extends State<Home> {
                     return Container();
                   case ConnectionState.active:
                   case ConnectionState.done:
-                    pages = pageData.data[1];
                     List<Task> retrieved_tasks = pageData.data[0];
+                    pages.addAll(pageData.data[1]);
+
                     if (!retrieved) {
                       pages.forEach((page) {
                         retrieved_tasks.forEach((task) {
